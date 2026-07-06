@@ -1,0 +1,139 @@
+/* GRID DE FIGURINHAS */
+
+.sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 2rem;
+    padding: 4rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* CARD */
+
+.sticker-card {
+    background: var(--card-bg);
+    aspect-ratio: 3/4.2;
+    border-radius: 20px;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.sticker-card:hover {
+    transform: translateY(-10px) rotate(2deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.sticker-card.have {
+    border-color: var(--panini-green);
+}
+
+.sticker-card.special {
+    background: linear-gradient(45deg, var(--panini-yellow), #fff);
+    border: 3px solid var(--panini-yellow);
+}
+
+.sticker-card.special::after {
+    content: '★';
+    position: absolute;
+    bottom: 50px;
+    font-size: 2rem;
+    color: var(--panini-yellow);
+    opacity: 0.5;
+}
+
+/*  INFORMAÇÕES */
+
+.sticker-info {
+    flex-grow: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(to bottom, #fff, #f9f9f9);
+}
+
+.sticker-team-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--panini-blue);
+    background: rgba(0, 170, 228, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.sticker-number {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--panini-red);
+}
+
+.sticker-name {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--panini-navy);
+    text-transform: uppercase;
+}
+
+.status-repeated {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    background: var(--panini-navy);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 900;
+}
+
+/* AÇÕES */
+
+.sticker-actions {
+    display: flex;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.btn-action {
+    flex: 1;
+    padding: 1rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    background: white;
+    transition: var(--transition);
+}
+
+.btn-have:hover {
+    background: var(--panini-green);
+    color: white;
+}
+
+.btn-have.active {
+    background: var(--panini-green);
+    color: white;
+}
+
+.btn-repeated:hover {
+    background: var(--panini-yellow);
+    color: var(--panini-navy);
+}
+
+.btn-repeated.active {
+    background: var(--panini-yellow);
+    color: var(--panini-navy);
+}
