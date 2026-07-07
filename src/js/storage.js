@@ -1,22 +1,3 @@
-function loadDataFromCloud() {
-    if (!db) return;
-
-    db.collection('users')
-        .doc(currentUser.uid)
-        .get()
-        .then(doc => {
-            if (doc.exists) {
-                stickers = mergeStickers(doc.data().stickers);
-            } else {
-                generateInitialData();
-                saveToCloud();
-            }
-
-            renderGrid();
-            updateStats();
-        });
-}
-
 function loadDataLocal() {
     const saved = localStorage.getItem('album-copa-v12');
 
@@ -30,15 +11,30 @@ function loadDataLocal() {
     updateStats();
 }
 
+async function loadDataFromCloud() {
+    if (!db || !currentUser) return;
+
+    const doc = await db.collection('users').doc(currentUser.uid).get();
+
+    if (doc.exists) {
+        stickers = mergeStickers(doc.data().stickers);
+    } else {
+        generateInitialData();
+        await saveToCloud();
+    }
+
+    renderGrid();
+    updateStats();
+}
+
 function generateInitialData() {
     stickers = {};
 
     TEAMS.forEach(team => {
-        const start = team.start !== undefined ? team.start : 1;
+        const start = getTeamStart(team);
 
         for (let i = start; i < start + team.stickers; i++) {
             const id = `${team.code}-${i}`;
-
             stickers[id] = {
                 have: false,
                 repeated: 0,
@@ -50,11 +46,11 @@ function generateInitialData() {
     });
 }
 
-function mergeStickers(savedStickers) {
+function mergeStickers(savedStickers = {}) {
     const newStickers = {};
 
     TEAMS.forEach(team => {
-        const start = team.start !== undefined ? team.start : 1;
+        const start = getTeamStart(team);
 
         for (let i = start; i < start + team.stickers; i++) {
             const id = `${team.code}-${i}`;
@@ -88,11 +84,8 @@ async function saveToCloud() {
     if (!currentUser || !db) return;
 
     try {
-        await db
-            .collection('users')
-            .doc(currentUser.uid)
-            .set({ stickers });
+        await db.collection('users').doc(currentUser.uid).set({ stickers });
     } catch (e) {
-        console.error("Erro ao salvar na nuvem:", e);
+        console.error("Erro ao salvar nuvem", e);
     }
 }

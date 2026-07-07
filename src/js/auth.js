@@ -17,9 +17,7 @@ function setupAuthListeners() {
     });
 
     authBtn.onclick = () => authModal.classList.remove('hidden');
-
     closeModal.onclick = () => authModal.classList.add('hidden');
-
     logoutBtn.onclick = () => auth.signOut();
 
     tabLogin.onclick = () => {
@@ -39,7 +37,6 @@ function setupAuthListeners() {
 
         const email = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-password').value;
-
         authError.innerText = '';
 
         try {

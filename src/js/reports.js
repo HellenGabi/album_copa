@@ -66,16 +66,7 @@ async function generateCompletePDFReport() {
             `;
 
             myStickers.forEach(s => {
-                let name = PLAYER_NAMES[s.team]?.[s.num - 1] || `Jogador ${s.num}`;
-
-                if (s.num === 1 && s.team !== 'CC' && s.team !== 'FWC') {
-                    name = 'Escudo';
-                }
-
-                if (s.num === 13 && s.team !== 'CC' && s.team !== 'FWC') {
-                    name = 'Time Completo';
-                }
-
+                let name = getStickerName(s.team, s.num);
                 let statusText = s.have ? 'OK' : 'SÓ REP.';
 
                 if (s.repeated > 0) {
@@ -110,26 +101,13 @@ async function generateCompletePDFReport() {
     const opt = {
         margin: 10,
         filename: `relatorio_copa2026_completo_${new Date().getTime()}.pdf`,
-        image: {
-            type: 'jpeg',
-            quality: 0.98
-        },
-        html2canvas: {
-            scale: 2,
-            useCORS: true
-        },
-        jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        }
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     try {
-        await html2pdf()
-            .set(opt)
-            .from(reportTemplate)
-            .save();
+        await html2pdf().set(opt).from(reportTemplate).save();
     } catch (err) {
         console.error("Erro ao gerar PDF:", err);
         alert("Ocorreu um erro ao gerar o PDF. Verifique o console.");
@@ -138,6 +116,7 @@ async function generateCompletePDFReport() {
         reportTemplate.innerHTML = '';
     }
 }
+
 async function generateMissingPDFReport() {
     const missing = Object.values(stickers).filter(s => !s.have).length;
     const total = Object.keys(stickers).length;
@@ -188,13 +167,7 @@ async function generateMissingPDFReport() {
             `;
 
             missingStickers.forEach(s => {
-                let name = PLAYER_NAMES[s.team]?.[s.num - 1] || `Jogador ${s.num}`;
-
-                if (s.num === 1 && s.team !== 'CC' && s.team !== 'FWC')
-                    name = 'Escudo';
-
-                if (s.num === 13 && s.team !== 'CC' && s.team !== 'FWC')
-                    name = 'Time Completo';
+                let name = getStickerName(s.team, s.num);
 
                 html += `
                     <div class="pdf-sticker-item">
@@ -224,26 +197,13 @@ async function generateMissingPDFReport() {
     const opt = {
         margin: 10,
         filename: `relatorio_copa2026_faltantes_${new Date().getTime()}.pdf`,
-        image: {
-            type: 'jpeg',
-            quality: 0.98
-        },
-        html2canvas: {
-            scale: 2,
-            useCORS: true
-        },
-        jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        }
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     try {
-        await html2pdf()
-            .set(opt)
-            .from(reportTemplate)
-            .save();
+        await html2pdf().set(opt).from(reportTemplate).save();
     } catch (err) {
         console.error("Erro ao gerar PDF:", err);
         alert("Ocorreu um erro ao gerar o PDF. Verifique o console.");
@@ -251,4 +211,119 @@ async function generateMissingPDFReport() {
         reportTemplate.style.display = 'none';
         reportTemplate.innerHTML = '';
     }
+}
+
+function generateTXTReport() {
+    closeReportModalFunc();
+
+    if (currentReportType === 'complete') {
+        generateCompleteTXTReport();
+    } else {
+        generateMissingTXTReport();
+    }
+}
+
+function generateCompleteTXTReport() {
+    let report = "==========================================\n";
+    report += "        ÁLBUM COPA DO MUNDO 2026        \n";
+    report += "==========================================\n\n";
+    report += `Data: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n`;
+
+    const owned = Object.values(stickers).filter(s => s.have).length;
+    const total = Object.keys(stickers).length;
+    const repeated = Object.values(stickers).reduce((acc, s) => acc + s.repeated, 0);
+    const percent = Math.round((owned / total) * 100);
+
+    report += `Progresso: ${owned} / ${total} [${percent}%]\n`;
+    report += `Total de Repetidas: ${repeated}\n\n`;
+    report += "------------------------------------------\n";
+    report += "        MINHAS FIGURINHAS POR PAÍS        \n";
+    report += "------------------------------------------\n";
+
+    TEAMS.forEach(team => {
+        const teamStickers = Object.keys(stickers)
+            .filter(id => id.startsWith(team.code))
+            .map(id => ({ id, ...stickers[id] }));
+
+        const myStickers = teamStickers.filter(s => s.have || s.repeated > 0);
+
+        if (myStickers.length > 0) {
+            const teamOwned = myStickers.filter(s => s.have).length;
+            report += `\n> ${team.name.toUpperCase()} (${teamOwned}/${team.stickers})\n`;
+
+            myStickers.forEach(s => {
+                let name = getStickerName(s.team, s.num);
+                let line = ` [#${s.num.toString().padStart(2, '0')}] ${name.padEnd(20)}`;
+
+                line += s.have ? " [X]" : " [ ]";
+
+                if (s.repeated > 0) {
+                    line += ` (+${s.repeated} rep)`;
+                }
+
+                report += line + "\n";
+            });
+        }
+    });
+
+    report += "\n\n==========================================\n";
+    report += "   Gerado automaticamente pelo Álbum      \n";
+    report += "==========================================\n";
+
+    downloadTXTReport(report, 'completo');
+}
+
+function generateMissingTXTReport() {
+    let report = "==========================================\n";
+    report += "  FIGURINHAS FALTANTES - COPA 2026       \n";
+    report += "==========================================\n\n";
+    report += `Data: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n`;
+
+    const owned = Object.values(stickers).filter(s => s.have).length;
+    const total = Object.keys(stickers).length;
+    const missing = total - owned;
+    const percent = Math.round((owned / total) * 100);
+
+    report += `Progresso: ${owned} / ${total} [${percent}%]\n`;
+    report += `Faltando: ${missing} figurinhas\n\n`;
+    report += "------------------------------------------\n";
+    report += "      FIGURINHAS QUE ESTÃO FALTANDO      \n";
+    report += "------------------------------------------\n";
+
+    TEAMS.forEach(team => {
+        const teamStickers = Object.keys(stickers)
+            .filter(id => id.startsWith(team.code))
+            .map(id => ({ id, ...stickers[id] }));
+
+        const missingStickers = teamStickers.filter(s => !s.have);
+
+        if (missingStickers.length > 0) {
+            report += `\n> ${team.name.toUpperCase()} (Faltando ${missingStickers.length}/${team.stickers})\n`;
+
+            missingStickers.forEach(s => {
+                let name = getStickerName(s.team, s.num);
+                let line = ` [#${s.num.toString().padStart(2, '0')}] ${name.padEnd(20)}`;
+                line += " ❌";
+                report += line + "\n";
+            });
+        }
+    });
+
+    report += "\n\n==========================================\n";
+    report += "   Gerado automaticamente pelo Álbum      \n";
+    report += "==========================================\n";
+
+    downloadTXTReport(report, 'faltantes');
+}
+
+function downloadTXTReport(report, type) {
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio_copa2026_${type}_${new Date().getTime()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

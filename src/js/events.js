@@ -20,15 +20,22 @@ function setupEventListeners() {
     markAsRepeatedBtn.onclick = applyRepeatedToSelected;
     multiSelectTeam.addEventListener('change', renderMultiSelectGrid);
 
-    window.onclick = (event) => {
-        if (event.target == reportModal) closeReportModalFunc();
-        if (event.target == authModal) authModal.classList.add('hidden');
-        if (event.target == multiSelectModal) closeMultiSelectModalFunc();
+    window.onclick = function (event) {
+        if (event.target === reportModal) closeReportModalFunc();
+        if (event.target === authModal) authModal.classList.add('hidden');
+        if (event.target === multiSelectModal) closeMultiSelectModalFunc();
     };
 
     filterBtns.forEach(btn => {
+        if (!btn.dataset.filter) return;
+
         btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
+            filterBtns.forEach(b => {
+                if (b.dataset.filter) {
+                    b.classList.remove('active');
+                }
+            });
+
             btn.classList.add('active');
             currentFilter = btn.dataset.filter;
             renderGrid();
@@ -40,3 +47,5 @@ function setupEventListeners() {
         renderGrid();
     });
 }
+
+init();
