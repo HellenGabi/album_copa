@@ -1,0 +1,62 @@
+/* VARIÁVEIS */
+
+:root {
+    --panini-yellow: #f9e110;
+    --panini-red: #e84a27;
+    --panini-blue: #00aae4;
+    --panini-green: #00a651;
+    --panini-navy: #004d98;
+
+    --bg-light: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-dark: #00153a;
+
+    --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* BODY */
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(0, 170, 228, 0.03) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(232, 74, 39, 0.03) 0%, transparent 20%);
+}
+
+/* UTILITÁRIOS */
+
+.hidden {
+    display: none !important;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--panini-navy);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--panini-blue);
+}
