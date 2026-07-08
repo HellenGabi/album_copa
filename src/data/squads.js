@@ -1916,7 +1916,7 @@ window.SQUADS = [
         "age": 33,
         "number": 10,
         "position": "Attacker",
-        "photo": "https://media.api-sports.io/football/players/276.png"
+        image: "assets/Neymar.jpg"
       },
       {
         "id": 1496,
